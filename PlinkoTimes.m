@@ -1,7 +1,9 @@
 tic
-times = zeros(100,2);
+n = 30;
 
-for i = 1:100
+times = zeros(n,2);
+
+for i = 1:n
     waitforbuttonpress;
     ts = toc;
     fprintf("Iteration %d Started\n", i);
