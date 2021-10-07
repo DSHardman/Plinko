@@ -1,27 +1,32 @@
-v = VideoReader('F1.wmv');
-load('F.mat');
+v = VideoReader('PMMATests/Videos/PMMA_L1_YB.wmv');
 
-allpaths(size(times,1),1) = Pathtaken();
-for i = 1:size(times,1)
-    startframe = round((times(i,1)+10)*v.FrameRate);
-    endframe = round((times(i,2)+10)*v.FrameRate);
-    locations = zeros(endframe-startframe+1,2);
-    for j = 1:size(locations,1)
-        location = plinkoMask(read(v,startframe+j-1));
-        if ~isnan(location)
-            locations(j,:) = location;
-        else
-            locations(j,:) = [NaN NaN];
+figure();
+offsets = 10.3;
+
+for o = 1:length(offsets)
+    offset = offsets(o);
+    allpaths(size(times,1),1) = Pathtaken();
+    for i = 1:size(times,1)
+        startframe = round((times(i,1)+offset)*v.FrameRate);
+        endframe = round((times(i,2)+offset)*v.FrameRate);
+        locations = zeros(endframe-startframe+1,2);
+        for j = 1:size(locations,1)
+            location = createRedMask(read(v,startframe+j-1));
+            if ~isnan(location)
+                locations(j,:) = location;
+            else
+                locations(j,:) = [NaN NaN];
+            end
         end
+        allpaths(i) = Pathtaken(locations);
+        %fprintf('Completed %d/%d\n', i, size(times,1));
     end
-    allpaths(i) = Pathtaken(locations);
-    fprintf('Completed %d/%d\n', i, size(times,1));
+    fprintf('Completed %f\n', offset);
+
+    subplot(3,3,o)
+    for i = 1:size(times, 1)
+        allpaths(i).plotpath()
+        hold on
+    end
 end
-
-
-%imshow(read(v,75));
-
-%im = read(v,75);
-%location = plinkoMask(im);
-%scatter(location(1),location(2));
 
