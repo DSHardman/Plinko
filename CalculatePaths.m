@@ -1,7 +1,7 @@
-v = VideoReader('PMMATests/Videos/PMMA_L1_YB.wmv');
+v = VideoReader('PMMATests/Videos/PMMA_L2_YB.wmv');
 
 figure();
-offsets = 10.3;
+offsets = 10.6;
 
 for o = 1:length(offsets)
     offset = offsets(o);
