@@ -24,8 +24,8 @@ classdef Pathtaken < handle
             y = -obj.path(1:end,2);
             plot(x,y+150, 'Color', col);
             %set(gca,'Color','k', 'XTick', [], 'YTick', []);
-            %xlim([0 210])
-            %ylim([0 150])
+            xlim([0 210])
+            ylim([0 150])
         end
         
        function scatterpath(obj, direction)
