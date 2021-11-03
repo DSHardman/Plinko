@@ -1,8 +1,9 @@
 radius = 15
 height = 2.5
+-- shape = ccylinder(radius, height)
 
--- emit a shape
-shape = ccylinder(radius, height)
+shape = path("z3plink.stl")
+
 emit(shape)
 
 --###########################################################
