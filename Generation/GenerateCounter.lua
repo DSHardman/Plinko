@@ -1,8 +1,7 @@
-radius = 15
-height = 2.5
+radius = 8
+height = 3
 -- shape = ccylinder(radius, height)
-
-shape = path("z3plink.stl")
+shape = load("o3plink.stl")
 
 emit(shape)
 
@@ -61,3 +60,4 @@ end
 set_setting_value('phasor_infill_iso_0', iso, v(-radius,-radius,-height/2), v(radius,radius,height/2))
 set_setting_value('phasor_infill_theta_0', 0)
 set_setting_value('phasor_infill_phi_0', phi, v(-radius,-radius,-height/2), v(radius,radius,height/2))
+set_setting_value('infill_percentage_0', 50)
