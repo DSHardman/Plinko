@@ -34,6 +34,10 @@ iso = tex3d_rgb8f(64, 64, 64) -- ISOTROPY (GAMMA) scales between 0 & 100%
 theta = tex3d_rgb8f(64, 64, 64) -- XY DIRECTION (THETA) scales between 0 & 360 degrees
 infill = tex3d_rgb8f(64, 64, 64) -- INFILL DENSITY scales between 0 & 100%
 
+xorigin = 0.5
+yorigin = 0.5
+zorigin = 0.5
+
 -- filling the 3D textures
 -- values in 3D textures are always in [0,1]
 -- the textures can hold up to three components
@@ -42,8 +46,9 @@ for i = 0,63 do
         for k = 0,63 do
             phi:set(i,j,k, v(0, 0, 0))
             iso:set(i,j,k, v(0.5, 0.5, 0.5))
-            density = 0.1 + 0.5*(math.sqrt(((i+1)/64)^2 + ((j+1)/64)^2 + ((k+1)/64)^2)/(math.sqrt(3))) -- varies spherically from origin
-            -- NB LOCATION OF ORIGIN HAS NOT YET BEEN SET
+            density = 0.1 + 0.5*(math.sqrt(((i+1)/64 - xorigin)^2 +
+                                            ((j+1)/64 - yorigin)^2 +
+                                            ((k+1)/64 - zorigin)^2)/(0.75)) -- varies spherically from origin
             infill:set(i,j,k, v(density, density, density))
             theta:set(i,j,k, v(0.5, 0.5, 0.5))
         end

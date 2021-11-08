@@ -1,3 +1,5 @@
+%% original MDF & PMMA vertical tests
+
 v = VideoReader('PMMATests/Videos/PMMA_L2_YB.wmv');
 
 figure();
@@ -29,4 +31,78 @@ for o = 1:length(offsets)
         hold on
     end
 end
+
+%% calculate paths from rotating system
+
+v = VideoReader('RotationTests/MaskedVideos/of50mask.mp4');
+imshow(read(v,50));
+centre = ginput(1);
+close();
+
+locations = zeros(v.NumFrames-30, 2);
+for i = 1:v.NumFrames-30
+    location = SmallRedMask(read(v,i));
+    if isnan(location)
+        locations(i,:) = [nan nan];
+    else
+        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
+    end
+end
+
+of50rotate = RotatingPath(locations);
+fprintf('complete\n');
+
+v = VideoReader('RotationTests/MaskedVideos/z30mask.mp4');
+imshow(read(v,50));
+centre = ginput(1);
+close();
+
+locations = zeros(v.NumFrames-30, 2);
+for i = 1:v.NumFrames-30
+    location = SmallRedMask(read(v,i));
+    if isnan(location)
+        locations(i,:) = [nan nan];
+    else
+        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
+    end
+end
+
+z30rotate = RotatingPath(locations);
+fprintf('complete\n');
+
+v = VideoReader('RotationTests/MaskedVideos/zf30mask.mp4');
+imshow(read(v,50));
+centre = ginput(1);
+close();
+
+locations = zeros(v.NumFrames-30, 2);
+for i = 1:v.NumFrames-30
+    location = SmallRedMask(read(v,i));
+    if isnan(location)
+        locations(i,:) = [nan nan];
+    else
+        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
+    end
+end
+
+zf30rotate = RotatingPath(locations);
+fprintf('complete\n');
+
+v = VideoReader('RotationTests/MaskedVideos/zf50mask.mp4');
+imshow(read(v,50));
+centre = ginput(1);
+close();
+
+locations = zeros(v.NumFrames-30, 2);
+for i = 1:v.NumFrames-30
+    location = SmallRedMask(read(v,i));
+    if isnan(location)
+        locations(i,:) = [nan nan];
+    else
+        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
+    end
+end
+
+zf50rotate = RotatingPath(locations);
+fprintf('complete\n');
 

@@ -1,6 +1,5 @@
-/Videos
 /CAD
 /Setup
 /Literature
 *.gcode
-/PMMATests/Videos
+**/Videos
