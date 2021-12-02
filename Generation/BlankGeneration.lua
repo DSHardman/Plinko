@@ -31,7 +31,7 @@ set_setting_value('filament_priming_mm_0',0)
 -- as of today all fields have to be 64x64x64
 phi = tex3d_rgb8f(64, 64, 64) -- INCLINATION scales between 0 & 360 degrees
 iso = tex3d_rgb8f(64, 64, 64) -- ISOTROPY (GAMMA) scales between 0 & 100%
-theta = tex3d_rgb8f(64, 64, 64) -- XY DIRECTION (THETA) scales between 0 & 360 degrees
+theta = tex3d_rgb8f(64, 64, 64) -- XY DIRECTION (F) scales between 0 & 360 degrees
 infill = tex3d_rgb8f(64, 64, 64) -- INFILL DENSITY scales between 0 & 100%
 
 xorigin = 0.5

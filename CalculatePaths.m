@@ -34,75 +34,32 @@ end
 
 %% calculate paths from rotating system
 
-v = VideoReader('RotationTests/MaskedVideos/of50mask.mp4');
+v = VideoReader('RotationTests/Videos/Repeats/Ystar.mp4');
 imshow(read(v,50));
 centre = ginput(1);
+radius = ginput(1);
+radius = norm(radius - centre);
 close();
 
-locations = zeros(v.NumFrames-30, 2);
-for i = 1:v.NumFrames-30
-    location = SmallRedMask(read(v,i));
+locations = zeros(v.NumFrames, 2);
+for n = 1:v.NumFrames
+    
+    im = imcrop(read(v,n), [centre(1)-radius centre(2)-radius radius*2 radius*2]);
+    for i = 1:size(im,1)
+        for j = 1:size(im,2)
+            if norm([i j] - [radius radius]) > radius
+                im(i,j,1) = 0;
+                im(i,j,2) = 0;
+                im(i,j,3) = 0;
+            end
+        end
+    end
+    
+    location = plinkoMask(im);
     if isnan(location)
-        locations(i,:) = [nan nan];
+        locations(n,:) = [nan nan];
     else
-        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
+        locations(n,:) = [location(1)-radius location(2)-radius];
     end
 end
-
-of50rotate = RotatingPath(locations);
-fprintf('complete\n');
-
-v = VideoReader('RotationTests/MaskedVideos/z30mask.mp4');
-imshow(read(v,50));
-centre = ginput(1);
-close();
-
-locations = zeros(v.NumFrames-30, 2);
-for i = 1:v.NumFrames-30
-    location = SmallRedMask(read(v,i));
-    if isnan(location)
-        locations(i,:) = [nan nan];
-    else
-        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
-    end
-end
-
-z30rotate = RotatingPath(locations);
-fprintf('complete\n');
-
-v = VideoReader('RotationTests/MaskedVideos/zf30mask.mp4');
-imshow(read(v,50));
-centre = ginput(1);
-close();
-
-locations = zeros(v.NumFrames-30, 2);
-for i = 1:v.NumFrames-30
-    location = SmallRedMask(read(v,i));
-    if isnan(location)
-        locations(i,:) = [nan nan];
-    else
-        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
-    end
-end
-
-zf30rotate = RotatingPath(locations);
-fprintf('complete\n');
-
-v = VideoReader('RotationTests/MaskedVideos/zf50mask.mp4');
-imshow(read(v,50));
-centre = ginput(1);
-close();
-
-locations = zeros(v.NumFrames-30, 2);
-for i = 1:v.NumFrames-30
-    location = SmallRedMask(read(v,i));
-    if isnan(location)
-        locations(i,:) = [nan nan];
-    else
-        locations(i,:) = [location(1)-centre(1) location(2)-centre(2)];
-    end
-end
-
-zf50rotate = RotatingPath(locations);
-fprintf('complete\n');
-
+Ystarrotate = RotatingPath(locations);
