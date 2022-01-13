@@ -46,6 +46,15 @@ classdef RotatingPath < handle
             ylim([-400 400]);
             axis square
         end
+
+        function radialhist(obj)
+            radii = zeros(size(obj.path, 1), 1);
+            for i = 1:size(obj.path, 1)
+                radii(i) = norm(obj.path(i,:));
+            end
+            histogram(radii, [0:25:400], 'Normalization','probability');
+            ylim([0 0.4]);
+        end
         
     end
 end
