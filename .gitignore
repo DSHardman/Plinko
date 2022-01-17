@@ -3,3 +3,4 @@
 /Literature
 *.gcode
 **/Videos
+/Generation/*.txt
