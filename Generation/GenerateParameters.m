@@ -1,12 +1,22 @@
-circles = [0 0 15; 3 3 5; 0 15 10; 0 -10 4];
-inclinationProbes = [1, 1, 1; 0.6, 0.6, 0.6; 0.2, 0.2, 0.2];
-thetaProbes = [1, 1, 1; 0.6, 0.6, 0.6; 0.2, 0.2, 0.2];
-densityProbes = [1, 1, 1; 0.6, 0.6, 0.6; 0.2, 0.2, 0.2];
+%% Randomly generate counter
 
-% Write matrices to text files which are accessed by IceSL
-writematrix(circles, 'circles.txt');
-[Xq,Yq] = meshgrid((0:63),(0:63));
-[X, Y] = meshgrid((0:31.5:63),(0:31.5:63));
-writematrix(interp2(X,Y,inclinationProbes,Xq,Yq), 'inclination.txt');
-writematrix(interp2(X,Y,thetaProbes,Xq,Yq), 'theta.txt');
-writematrix(interp2(X,Y,densityProbes,Xq,Yq), 'density.txt');
+counterradius = 10 + 5*rand(); % between 10 & 15
+[holex, holey] = pol2cart(2*pi*rand(), (counterradius-7)*rand());
+subtractive = zeros(3,3);
+for i = 1:size(subtractive, 1)
+    subr = 2*counterradius*rand();
+    [subx, suby] = pol2cart(2*pi*rand(), subr);
+    if subr <= counterradius
+        subtractive(i,:) = [subx suby subr*rand()];
+    else
+        subtractive(i,:) = [subx suby subr + counterradius*(rand() - 1)];
+    end
+end
+
+% Randomise material fields
+inclination = rand(3);
+theta= rand(3);
+density = rand(3);
+
+testcounter = Counter(counterradius, [holex holey], inclination, theta,...
+                density, subtractive);
