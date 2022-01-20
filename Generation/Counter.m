@@ -12,12 +12,14 @@ classdef Counter
         function obj = Counter(radius, holeloc, inclination, theta,...
                 density, subtractive)
             % CONSTRUCTOR
-            obj.radius = radius;
-            obj.holeloc = holeloc;
-            obj.inclination = inclination;
-            obj.theta = theta;
-            obj.density = density;
-            obj.subtractive = subtractive;
+            if nargin > 0
+                obj.radius = radius;
+                obj.holeloc = holeloc;
+                obj.inclination = inclination;
+                obj.theta = theta;
+                obj.density = density;
+                obj.subtractive = subtractive;
+            end
         end
 
         function generate(obj, filename)

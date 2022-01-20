@@ -25,18 +25,19 @@ classdef Population
 
             % Generate and read through all gcode files, finding locations
             % at which each layer starts/ends
-            no_layers = 15; % assume 3mm thickness and 0.2mm layers
+            no_layers = 10; % assume 3mm thickness and 0.3mm layers
             layerlocations = zeros(no_layers+1, size(obj.counters, 1));
             for i = 1:size(obj.counters, 1)
+                fprintf('%d/%d\n', i, size(obj.counters, 1));
                 obj.counters(i).generate("temp"+string(i));  
                 f = fopen("temp"+string(i)+".gcode",'r');
                 n = 1;
                 layers = 0;
                 line = fgetl(f);
-                while ischar(line) && layers < 16
+                while ischar(line) && layers < 11
                     line = fgetl(f);
                     n = n + 1;
-                    if contains(line,"Z0.2") % Find start of first layer
+                    if contains(line,"Z0.3") % Find start of first layer
                         if layers % which begins from second occurrence
                             layerlocations(1, i) = n;
                         end
@@ -50,6 +51,8 @@ classdef Population
                 fclose(f);
             end
             
+            fprintf("Combining gcode...\n")
+
             % Copy printer setup lines to output file
             gcodestring = "";
             f = fopen("temp1.gcode",'r');
@@ -68,7 +71,6 @@ classdef Population
 
             % Iterate through all counters' gcode in every layer
             for i = 1:no_layers
-                fprintf('Layer %d\n', i)
                 for j = 1:size(obj.counters, 1)
 
                     % Extract translate from centre of this counter
@@ -170,6 +172,11 @@ classdef Population
             % Close and delete temporary gcode files
             fclose('all');
             system('del temp*.gcode');
+
+            fprintf("gcode combined.\n")
+
+            % View output
+            system(string(filename) + ".gcode");
         end
     end
 end

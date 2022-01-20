@@ -2,7 +2,7 @@
 set_service('FilamentSlicer') -- Service mode: slice without GUI
 
 set_setting_value('printer', 'Prusa_MK3S')
-set_setting_value('z_layer_height_mm', 0.2)
+set_setting_value('z_layer_height_mm', 0.3)
 
 -- setting up some slicing settings
 set_setting_value('infill_type_0', 'Phasor')
