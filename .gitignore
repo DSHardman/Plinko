@@ -3,4 +3,4 @@
 /Literature
 *.gcode
 **/Videos
-/Generation/*.txt
+/Generation/CounterData
