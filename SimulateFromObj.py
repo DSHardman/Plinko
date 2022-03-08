@@ -8,16 +8,19 @@ import pychrono.irrlicht as chronoirr
 import os
 
 
-def dropdisc(dropx, dropy, number, discradius=0.008, pegradius=0.001, pegspacing=0.022):
+def dropdisc(dropx, dropy, number, discradius=0.008, pegradius=0.001, pegspacing=0.035):
+    #chrono.SetChronoDataPath("")
+    obj_path = 'C:/Users/dshar/OneDrive - University of Cambridge/Documents/PhD/Plinko/example.obj'
 
     my_system = chrono.ChSystemNSC()
 
-    chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.001)
-    chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.01)
+    chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.001)  # 0.001?
+    chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.01)  # 0.001?
     chrono.SetChronoDataPath("C:/Users/dshar/miniconda3/pkgs/pychrono-7.0.0-py39_0/Library/data/")
 
     my_system.SetSolverMaxIterations(70)
 
+    peg_dens = 1000
     peg_mat = chrono.ChMaterialSurfaceNSC()
     peg_mat.SetFriction(0.5)
     peg_mat.SetDampingF(0.2)
@@ -28,6 +31,7 @@ def dropdisc(dropx, dropy, number, discradius=0.008, pegradius=0.001, pegspacing
     # peg_mat.SetComplianceRolling(0.0000001)
     # peg_mat.SetComplianceSpinning(0.0000001)
 
+    disc_dens = 7000
     disc_mat = chrono.ChMaterialSurfaceNSC()
     disc_mat.SetFriction(0.5)
     disc_mat.SetDampingF(0.2)
@@ -41,30 +45,48 @@ def dropdisc(dropx, dropy, number, discradius=0.008, pegradius=0.001, pegspacing
     # Add wall
     body_wall = chrono.ChBody()
     body_wall.SetBodyFixed(True)
-    body_wall.SetPos(chrono.ChVectorD(2*pegspacing, -3*pegspacing, -0.003))
+    body_wall.SetPos(chrono.ChVectorD(3.5*pegspacing, -2*pegspacing, -0.003))
 
     body_wall.GetCollisionModel().ClearModel()
-    body_wall.GetCollisionModel().AddBox(peg_mat, 0.08, 0.10, 0.001)
+    body_wall.GetCollisionModel().AddBox(peg_mat, 0.08, 0.10, 0.001)  # TODO: IN TERMS OF SPACING
     body_wall.GetCollisionModel().BuildModel()
     body_wall.SetCollide(True)
 
     body_wall_shape = chrono.ChBoxShape()
-    body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.08, 0.10, 0.001)
+    body_wall_shape.GetBoxGeometry().Size = chrono.ChVectorD(4.5*pegspacing, 4*pegspacing, 0.001)
     body_wall.GetAssets().push_back(body_wall_shape)
 
     body_wall_texture = chrono.ChTexture()
-    body_wall_texture.SetTextureFilename('concrete.jpg')#chrono.GetChronoDataFile('textures/concrete.jpg'))
+    body_wall_texture.SetTextureFilename('concrete.jpg')
     body_wall.GetAssets().push_back(body_wall_texture)
 
     my_system.Add(body_wall)
 
-    # Add disc
-    body_disc = chrono.ChBodyEasyCylinder(discradius, discradius/10, 1000)
+    # Add side walls
+    for i in range(2):
+        body_side = chrono.ChBody()
+        body_side.SetBodyFixed(True)
+        body_side.SetPos(chrono.ChVectorD(i*9*pegspacing - pegspacing, -2*pegspacing, 0.005))
 
-    body_disc.GetCollisionModel().ClearModel()
-    body_disc.GetCollisionModel().AddCylinder(disc_mat, discradius, discradius, discradius/10)
-    body_disc.GetCollisionModel().BuildModel()
-    body_disc.SetCollide(True)
+        body_side.GetCollisionModel().ClearModel()
+        body_side.GetCollisionModel().AddBox(peg_mat, 0.08, 0.10, 0.001) # TODO: ADJUST
+        body_side.GetCollisionModel().BuildModel()
+        body_side.SetCollide(True)
+
+        body_side_shape = chrono.ChBoxShape()
+        body_side_shape.GetBoxGeometry().Size = chrono.ChVectorD(0.003, 4*pegspacing, 0.01)
+        body_side.GetAssets().push_back(body_side_shape)
+
+        body_side_texture = chrono.ChTexture()
+        body_side_texture.SetTextureFilename('concrete.jpg')
+        body_side.GetAssets().push_back(body_side_texture)
+
+        my_system.Add(body_side)
+
+    # Add disc
+    # Uses 'Method A' from irrlicht/demo_IRR_collision_trimesh.py example - automatically calculates properties
+    body_disc = chrono.ChBodyEasyMesh(obj_path, disc_dens, True, True, True, disc_mat)
+    # Trues are for: automatically compute mass and inertia, visualise, collide
 
     body_disc.SetBodyFixed(False)
     body_disc.SetPos(chrono.ChVectorD(dropx, dropy, 0))
@@ -75,8 +97,8 @@ def dropdisc(dropx, dropy, number, discradius=0.008, pegradius=0.001, pegspacing
     mjointC.Initialize(body_disc, body_wall, chrono.ChCoordsysD(chrono.ChVectorD(0, 0, 1)))
     my_system.Add(mjointC)
 
-    def add_peg(x,y):
-        body_peg = chrono.ChBodyEasyCylinder(pegradius, pegradius*10, 1000)
+    def add_peg(x, y):
+        body_peg = chrono.ChBodyEasyCylinder(pegradius, pegradius*10, peg_dens)
 
         body_peg.GetCollisionModel().ClearModel()
         body_peg.GetCollisionModel().AddCylinder(peg_mat, pegradius, pegradius, pegradius*10)
@@ -88,13 +110,15 @@ def dropdisc(dropx, dropy, number, discradius=0.008, pegradius=0.001, pegspacing
         body_peg.SetRot(chrono.Q_ROTATE_Y_TO_Z)
         my_system.Add(body_peg)
 
-    for i in range(5):
-        for j in range(4):
+    for i in range(8):
+        for j in range(3):
             add_peg(i*pegspacing, -j*2*pegspacing)
 
-    for i in range(4):
-        for j in range(3):
+    for i in range(7):
+        for j in range(2):
             add_peg(i*pegspacing+pegspacing/2, -j*2*pegspacing-pegspacing)
+
+    add_peg(3.5*pegspacing, pegspacing)
     # ---------------------------------------------------------------------
     #
     #  Create an Irrlicht application to visualize the system
