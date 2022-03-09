@@ -3,40 +3,41 @@
 
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
-import os
 
 
-# Simulation defined in here:
-def dropdisc(dropx, dropy, mesh, number=1, pegradius=1, pegspacing=35, write=False):
+# Simulation defined and run in here:
+def drop_disc(mesh, dropx, dropy, rotation, friction=0.1, restitution=0.2, write=False):
+    # Defaults
+    pegradius = 1
+    pegspacing = 35
+
+    # NSC system setup
     obj_path = 'C:/Users/dshar/OneDrive - University of Cambridge/Documents/PhD/Plinko/Simulations/Meshes/' + mesh + '.obj'
     my_system = chrono.ChSystemNSC()
-    my_system.Set_G_acc(chrono.ChVectorD(0, -9810, 0)) # mm used as base length unit to import stl
+    my_system.Set_G_acc(chrono.ChVectorD(0, -9810, 0))  # mm used as base length unit to import stl
 
-    chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.01)
-    chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.01)
+    chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.0001)
+    chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.0001)
     chrono.SetChronoDataPath("C:/Users/dshar/miniconda3/pkgs/pychrono-7.0.0-py39_0/Library/data/")
 
     my_system.SetSolverMaxIterations(150)
 
-    peg_dens = 1e-6
+    # Material setup
+    peg_dens = 7.9e-6
     peg_mat = chrono.ChMaterialSurfaceNSC()
-    peg_mat.SetFriction(0.2)  # Static and kinetic set simultaneously
-    peg_mat.SetRestitution(0.3)
+    peg_mat.SetFriction(friction)  # Static and kinetic set simultaneously
+    peg_mat.SetRestitution(restitution)
     peg_mat.SetCompliance(0)  # Normal direction: rigid
     peg_mat.SetComplianceT(0)  # Tangential direction: rigid
-    # Rolling & spinning frictions & compliances are left as zero default
+    # Rolling & spinning friction & compliance are left as zero default
 
-    disc_dens = 7e-6
+    disc_dens = 1e-6
     disc_mat = chrono.ChMaterialSurfaceNSC()
-    disc_mat.SetFriction(0.2)
-    disc_mat.SetRestitution(0.3)
-    peg_mat.SetCompliance(100)  # Normal direction
-    peg_mat.SetComplianceT(100)  # Tangential direction
-    # disc_mat.SetDampingF(0.2)
-    #disc_mat.SetCompliance(0.0000001)
-    #disc_mat.SetComplianceT(0.0000001)
+    disc_mat.SetFriction(friction)
+    disc_mat.SetRestitution(restitution)
+    # Compliance not explicitly considered
 
-    # Add wall
+    # Add back wall
     body_wall = chrono.ChBody()
     body_wall.SetBodyFixed(True)
     body_wall.SetPos(chrono.ChVectorD(3.5*pegspacing, -2*pegspacing, -3))
@@ -83,14 +84,17 @@ def dropdisc(dropx, dropy, mesh, number=1, pegradius=1, pegspacing=35, write=Fal
     # Trues are for: automatically compute mass and inertia, visualise, collide
 
     body_disc.SetBodyFixed(False)
-    body_disc.SetPos(chrono.ChVectorD(dropx, dropy, 1))
+    body_disc.SetPos(chrono.ChVectorD(122.5+dropx, 105+dropy, 1))
     body_disc.SetRot(chrono.Q_ROTATE_X_TO_Y)
+    body_disc.SetRot(chrono.ChMatrix33D(rotation, chrono.ChVectorD(0, 0, 1)))
     my_system.Add(body_disc)
 
+    # Constrain disc parallel to back wall
     mjointC = chrono.ChLinkLockParallel()
     mjointC.Initialize(body_disc, body_wall, chrono.ChCoordsysD(chrono.ChVectorD(0, 0, 1)))
     my_system.Add(mjointC)
 
+    # Define pegs
     def add_peg(x, y):
         body_peg = chrono.ChBodyEasyCylinder(pegradius, pegradius*10, peg_dens)
 
@@ -112,12 +116,10 @@ def dropdisc(dropx, dropy, mesh, number=1, pegradius=1, pegspacing=35, write=Fal
         for j in range(2):
             add_peg(i*pegspacing+pegspacing/2, -j*2*pegspacing-pegspacing)
 
+    # Top peg
     add_peg(3.5*pegspacing, pegspacing)
-    # ---------------------------------------------------------------------
-    #
-    #  Create an Irrlicht application to visualize the system
-    #
 
+    # Visualise with Irrlicht engine
     myapplication = chronoirr.ChIrrApp(my_system, 'Plinko Simulator', chronoirr.dimension2du(1024, 768))
 
     myapplication.AddTypicalSky()
@@ -125,8 +127,8 @@ def dropdisc(dropx, dropy, mesh, number=1, pegradius=1, pegspacing=35, write=Fal
     myapplication.AddLightWithShadow(chronoirr.vector3df(0, 0, 500),    # point
                                      chronoirr.vector3df(0, 0, 0),    # aimpoint
                                      2000,                 # radius (power)
-                                     1000, 9000,               # near, far
-                                     40)                # angle of FOV
+                                     1000, 9000,           # near, far
+                                     40)                   # angle of FOV
 
     myapplication.AssetBindAll()
     myapplication.AssetUpdateAll()
@@ -136,7 +138,7 @@ def dropdisc(dropx, dropy, mesh, number=1, pegradius=1, pegspacing=35, write=Fal
     myapplication.SetTryRealtime(True)
 
     if write:
-        f = open("Path" + str(number) + ".txt", "w")
+        f = open("Path.txt", "w")
     while myapplication.GetDevice().run():
         myapplication.BeginScene()
         myapplication.DrawAll()
@@ -144,11 +146,23 @@ def dropdisc(dropx, dropy, mesh, number=1, pegradius=1, pegspacing=35, write=Fal
             myapplication.DoStep()
         if write:
             f.write(str(body_disc.GetCoord().pos.x) + ", " + str(body_disc.GetCoord().pos.y) + "\n")
+        # Exit when bottom of board is reached
         if body_disc.GetCoord().pos.y < -5.5*pegspacing:
-            return [body_disc.GetCoord().pos.x]
+            return [body_disc.GetCoord().pos.x - 122.5]
         myapplication.EndScene()
     if write:
         f.close()
 
 
-dropdisc(120, 100, 'examplecross', write=False)
+def output_repeatability(mesh):
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                for l in range(3):
+                    for m in range(3):
+                        position = drop_disc(mesh, dropxs(i), dropys(j), rotations(k), frictions(l), restitutions(m))
+                        positions[m + 3*l + 9*k + 27*j + 81*i] = (dropxs(i), dropys(j), rotations(k), frictions(l),
+                                                                  restitutions(m), position)
+
+
+#output_repeatability('examplecross')
