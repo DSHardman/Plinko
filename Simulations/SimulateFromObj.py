@@ -3,21 +3,24 @@
 
 import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
+import numpy as np
 
 
 # Simulation defined and run in here:
-def drop_disc(mesh, dropx, dropy, rotation, friction=0.1, restitution=0.2, write=False):
+def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, friction=0.1, restitution=0.2, maxsteps=10000,
+              write=False, visualise=False):
     # Defaults
     pegradius = 1
     pegspacing = 35
+    timestep = 0.001
 
     # NSC system setup
     obj_path = 'C:/Users/dshar/OneDrive - University of Cambridge/Documents/PhD/Plinko/Simulations/Meshes/' + mesh + '.obj'
     my_system = chrono.ChSystemNSC()
     my_system.Set_G_acc(chrono.ChVectorD(0, -9810, 0))  # mm used as base length unit to import stl
 
-    chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.0001)
-    chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.0001)
+    #chrono.ChCollisionModel.SetDefaultSuggestedEnvelope(0.00001)
+    #chrono.ChCollisionModel.SetDefaultSuggestedMargin(0.00001)
     chrono.SetChronoDataPath("C:/Users/dshar/miniconda3/pkgs/pychrono-7.0.0-py39_0/Library/data/")
 
     my_system.SetSolverMaxIterations(150)
@@ -119,50 +122,65 @@ def drop_disc(mesh, dropx, dropy, rotation, friction=0.1, restitution=0.2, write
     # Top peg
     add_peg(3.5*pegspacing, pegspacing)
 
-    # Visualise with Irrlicht engine
-    myapplication = chronoirr.ChIrrApp(my_system, 'Plinko Simulator', chronoirr.dimension2du(1024, 768))
+    # Setup Irrlicht engine
+    if visualise:
+        myapplication = chronoirr.ChIrrApp(my_system, 'Plinko Simulator', chronoirr.dimension2du(1024, 768))
+        myapplication.SetTimestep(timestep)
+        myapplication.AddTypicalSky()
+        myapplication.AddTypicalCamera(chronoirr.vector3df(-20, 60, 200), chronoirr.vector3df(2*pegspacing, -2*pegspacing, 0))
+        myapplication.AddLightWithShadow(chronoirr.vector3df(0, 0, 500),    # point
+                                         chronoirr.vector3df(0, 0, 0),    # aimpoint
+                                         2000,                 # radius (power)
+                                         1000, 9000,           # near, far
+                                         40)                   # angle of FOV
 
-    myapplication.AddTypicalSky()
-    myapplication.AddTypicalCamera(chronoirr.vector3df(-20, 60, 200), chronoirr.vector3df(2*pegspacing, -2*pegspacing, 0))
-    myapplication.AddLightWithShadow(chronoirr.vector3df(0, 0, 500),    # point
-                                     chronoirr.vector3df(0, 0, 0),    # aimpoint
-                                     2000,                 # radius (power)
-                                     1000, 9000,           # near, far
-                                     40)                   # angle of FOV
-
-    myapplication.AssetBindAll()
-    myapplication.AssetUpdateAll()
-    myapplication.AddShadowAll()
-
-    myapplication.SetTimestep(0.001)
-    myapplication.SetTryRealtime(True)
+        myapplication.AssetBindAll()
+        myapplication.AssetUpdateAll()
+        myapplication.AddShadowAll()
+        myapplication.SetTryRealtime(True)
 
     if write:
         f = open("Path.txt", "w")
-    while myapplication.GetDevice().run():
-        myapplication.BeginScene()
-        myapplication.DrawAll()
-        for substep in range(0, 5):
-            myapplication.DoStep()
+    for n in range(maxsteps):  # Maximum number of steps
+        if visualise:
+            myapplication.BeginScene()
+            myapplication.DrawAll()
+            for substep in range(0, 5):
+                myapplication.DoStep()
+        else:
+            my_system.DoStepDynamics(timestep)
         if write:
             f.write(str(body_disc.GetCoord().pos.x) + ", " + str(body_disc.GetCoord().pos.y) + "\n")
         # Exit when bottom of board is reached
         if body_disc.GetCoord().pos.y < -5.5*pegspacing:
+            if write:
+                f.close()
             return [body_disc.GetCoord().pos.x - 122.5]
-        myapplication.EndScene()
-    if write:
-        f.close()
+        if visualise:
+            myapplication.EndScene()
+    print('Maximum number of steps reached: ending simulation.\n')
 
 
 def output_repeatability(mesh):
+    dropxs = [0.1, 1.1, 2.1]
+    dropys = [-1, 0, 1]
+    rotations = [-np.pi/36, 0, np.pi/36]
+    frictions = [0, 0, 0]
+    restitutions = [0, 0, 0]
+
+    positions = [0]*(3**5)
+
     for i in range(3):
         for j in range(3):
             for k in range(3):
                 for l in range(3):
                     for m in range(3):
-                        position = drop_disc(mesh, dropxs(i), dropys(j), rotations(k), frictions(l), restitutions(m))
-                        positions[m + 3*l + 9*k + 27*j + 81*i] = (dropxs(i), dropys(j), rotations(k), frictions(l),
-                                                                  restitutions(m), position)
+                        position = drop_disc(mesh, dropxs[i], dropys[j], rotations[k], frictions[l], restitutions[m])
+                        positions[m + 3*l + 9*k + 27*j + 81*i] = (dropxs[i], dropys[j], rotations[k], frictions[l],
+                                                                  restitutions[m], position[0])
+                        print(m + 3*l + 9*k + 27*j + 81*i)
+    np.save(mesh, positions)
 
 
-#output_repeatability('examplecross')
+position = drop_disc('examplecross', visualise=True)
+#output_repeatability('example')
