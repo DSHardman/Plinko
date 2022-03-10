@@ -4,4 +4,6 @@
 *.gcode
 **/Videos
 /Generation/CounterData
+/Simulations/CounterData
+/Simulations/Meshes
 /.idea

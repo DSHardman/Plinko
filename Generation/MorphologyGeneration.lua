@@ -114,4 +114,4 @@ set_setting_value('infill_percentage_0', infill, v(-radius,-radius,-height/2), v
 local file = assert(io.open("CounterData/CounterName.txt", "r"))
 local savename = file:read()
 run_service(savename .. ".gcode")
-f:close()
+file:close()

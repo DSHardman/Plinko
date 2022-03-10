@@ -182,5 +182,5 @@ def output_repeatability(mesh):
     np.save(mesh, positions)
 
 
-position = drop_disc('examplecross', visualise=True)
+position = drop_disc('temp6', visualise=True)
 #output_repeatability('example')
