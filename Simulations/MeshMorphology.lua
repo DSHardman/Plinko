@@ -1,7 +1,7 @@
 -- Export as obj
 set_service('MeshExportService') -- Service mode: slice without GUI
 set_setting_value('meshing_method', 'Dual contouring')
-set_setting_value('voxel_size_mm', '0.05')
+set_setting_value('voxel_size_mm', 0.4)
 
 height = 3 -- This cannot be changed externally
 
@@ -34,5 +34,5 @@ emit(union(c, difference(cylinder(7, v(hole[1], hole[2], -height/2), v(hole[1], 
 -- Read desired file name and output gcode file
 local file = assert(io.open("CounterData/CounterName.txt", "r"))
 local savename = file:read()
-run_service("Meshes/" .. savename .. ".obj")
+run_service("../Simulations/Meshes/" .. savename .. ".obj")
 file:close()

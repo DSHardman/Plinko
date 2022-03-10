@@ -5,7 +5,6 @@ import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
 import numpy as np
 
-
 # Simulation defined and run in here:
 def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, friction=0.1, restitution=0.2, maxsteps=10000,
               write=False, visualise=False):
@@ -180,7 +179,3 @@ def output_repeatability(mesh):
                                                                   restitutions[m], position[0])
                         print(m + 3*l + 9*k + 27*j + 81*i)
     np.save(mesh, positions)
-
-
-position = drop_disc('temp6', visualise=True)
-#output_repeatability('example')

@@ -121,5 +121,14 @@ classdef Counter
             subplot(1,4,4); obj.plotdensity(); title('Density');
             set(gcf, 'Position', 1000*[0.0066 0.5042 1.5000 0.3538])
         end
+
+        function simulate(obj, visualise)
+            circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
+            writematrix(circles, 'CounterData/circles.txt');
+            evalc("system('IceSL-slicer.exe --io -s" +...
+                " ../Simulations/MeshMorphology.lua');");
+            evalc("system('py ../Simulations/DropSingle.py " +  "simulated " +...
+                string(visualise) + "');");
+        end
     end
 end
