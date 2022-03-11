@@ -29,4 +29,4 @@ for i = 1:n
     testpopulation(i, 1) = testcounter;
 end
 testpopulation = Population(testpopulation);
-testpopulation.generate('output');
+%testpopulation.generate('output');

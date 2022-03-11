@@ -122,13 +122,42 @@ classdef Counter
             set(gcf, 'Position', 1000*[0.0066 0.5042 1.5000 0.3538])
         end
 
-        function simulate(obj, visualise)
+        function simulate(obj)
+            % Visualise a single simulation with default parameters
             circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
             writematrix(circles, 'CounterData/circles.txt');
+            % Generate .obj file of solid shape using IceSL API
             evalc("system('IceSL-slicer.exe --io -s" +...
                 " ../Simulations/MeshMorphology.lua');");
+            % Simulate and visualise path using pychrono
             evalc("system('py ../Simulations/DropSingle.py " +  "simulated " +...
-                string(visualise) + "');");
+                "1" + "');");
+        end
+
+        function deviation = testrepeatability(obj, histbool)
+            % Visualise a single simulation with default parameters
+            circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
+            writematrix(circles, 'CounterData/circles.txt');
+            % Generate .obj file of solid shape using IceSL API
+            evalc("system('IceSL-slicer.exe --io -s" +...
+                " ../Simulations/MeshMorphology.lua');");
+            % Test repeatability using pychrono
+            evalc("system('py ../Simulations/TestRepeatability.py simulated');");
+            % Read data from file
+            repeats = readNPY("../Simulations/Meshes/simulated.npy");
+
+            X = repeats(:, end);
+            X(isnan(X)) = []; % Remove NaN elements
+            if length(X) > 70
+                deviation = std(X); % return std of output positions
+            else
+                deviation = 300; % set high if there are too many NaN elements
+            end
+
+            if nargin == 2 && histbool == 1 % plot histogram if requested
+                edges = [-160 -122.5 -87.5 -52.5 -17.5 17.5 52.5 87.5 122.5 160];
+                histogram(X,edges)
+            end
         end
     end
 end

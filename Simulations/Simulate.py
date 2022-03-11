@@ -5,8 +5,9 @@ import pychrono.core as chrono
 import pychrono.irrlicht as chronoirr
 import numpy as np
 
+
 # Simulation defined and run in here:
-def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, friction=0.1, restitution=0.2, maxsteps=10000,
+def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=5000, friction=0.2,
               write=False, visualise=False):
     # Defaults
     pegradius = 1
@@ -157,25 +158,26 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, friction=0.1, restitution=0.
             return [body_disc.GetCoord().pos.x - 122.5]
         if visualise:
             myapplication.EndScene()
-    print('Maximum number of steps reached: ending simulation.\n')
+    print('Maximum number of steps reached: ending simulation.')
 
 
 def output_repeatability(mesh):
     dropxs = [0.1, 1.1, 2.1]
     dropys = [-1, 0, 1]
     rotations = [-np.pi/36, 0, np.pi/36]
-    frictions = [0, 0, 0]
-    restitutions = [0, 0, 0]
+    restitutions = [0.2, 0.3, 0.4]
 
-    positions = [0]*(3**5)
+    positions = [0]*(3**4)
 
     for i in range(3):
         for j in range(3):
             for k in range(3):
-                for l in range(3):
-                    for m in range(3):
-                        position = drop_disc(mesh, dropxs[i], dropys[j], rotations[k], frictions[l], restitutions[m])
-                        positions[m + 3*l + 9*k + 27*j + 81*i] = (dropxs[i], dropys[j], rotations[k], frictions[l],
-                                                                  restitutions[m], position[0])
-                        print(m + 3*l + 9*k + 27*j + 81*i)
-    np.save(mesh, positions)
+                for m in range(3):
+                    position = drop_disc(mesh, dropxs[i], dropys[j], rotations[k], restitutions[m])
+                    if position is None:
+                        position = [np.nan]
+                    positions[m + 3*k + 9*j + 27*i] = (dropxs[i], dropys[j], rotations[k],
+                                                       restitutions[m], position[0])
+                    print(m + 3*k + 9*j + 27*i)
+    np.save('C:/Users/dshar/OneDrive - University of Cambridge/Documents/PhD/Plinko/Simulations/Meshes/' + mesh,
+            positions)
