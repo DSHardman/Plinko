@@ -134,7 +134,7 @@ classdef Counter
                 "1" + "');");
         end
 
-        function deviation = testrepeatability(obj, histbool)
+        function factor = testrepeatability(obj, histbool)
             % Visualise a single simulation with default parameters
             circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
             writematrix(circles, 'CounterData/circles.txt');
@@ -148,14 +148,19 @@ classdef Counter
 
             X = repeats(:, end);
             X(isnan(X)) = []; % Remove NaN elements
-            if length(X) > 70
-                deviation = std(X); % return std of output positions
-            else
-                deviation = 300; % set high if there are too many NaN elements
-            end
+%             if length(X) > 70
+%                 deviation = std(X); % return std of output positions
+%             else
+%                 deviation = 300; % set high if there are too many NaN elements
+%             end
+
+            % Output proportion of runs which land in the highest scoring
+            % bin
+            edges = [-160 -122.5 -87.5 -52.5 -17.5 17.5 52.5 87.5 122.5 160];
+            Y = discretize(X, edges);
+            factor = length(find(Y==mode(Y)))/length(Y);
 
             if nargin == 2 && histbool == 1 % plot histogram if requested
-                edges = [-160 -122.5 -87.5 -52.5 -17.5 17.5 52.5 87.5 122.5 160];
                 histogram(X,edges)
             end
         end

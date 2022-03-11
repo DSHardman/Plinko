@@ -27,9 +27,8 @@ for line in file:lines() do
 end
 file:close()
 
--- Maintain a solid 2mm border around the payload, and emit shape
-emit(union(c, difference(cylinder(7, v(hole[1], hole[2], -height/2), v(hole[1], hole[2], height/2)),
-                         cylinder(5, v(hole[1], hole[2], -height/2), v(hole[1], hole[2], height/2)))))
+-- Maintain a solid payload area including 2mm border, and emit shape
+emit(union(c, cylinder(7, v(hole[1], hole[2], -height/2), v(hole[1], hole[2], height/2))))
 
 -- Read desired file name and output gcode file
 local file = assert(io.open("CounterData/CounterName.txt", "r"))
