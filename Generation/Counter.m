@@ -158,7 +158,13 @@ classdef Counter
             % bin
             edges = [-160 -122.5 -87.5 -52.5 -17.5 17.5 52.5 87.5 122.5 160];
             Y = discretize(X, edges);
-            factor = length(find(Y==mode(Y)))/length(Y);
+            %factor = length(find(Y==mode(Y)))/length(Y);
+            %factor = 9*length(X) - sum(Y); %minimisation: bias to right
+            Y.'
+            factor = 0;
+            for i = 1:length(Y)
+                factor = factor + 9 - Y(i);
+            end
 
             if nargin == 2 && histbool == 1 % plot histogram if requested
                 histogram(X,edges)

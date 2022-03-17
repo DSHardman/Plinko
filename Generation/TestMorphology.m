@@ -1,4 +1,4 @@
-function proportion = TestMorphology(x)
+function output = TestMorphology(x)
 
     % Parameters:
     % counter_radius: 10 to 15 (mm), radius of counter
@@ -25,5 +25,8 @@ function proportion = TestMorphology(x)
                 ones(3), subtractive);
 
     % BO minimisation, so return proportion not in modal bin
-    proportion = 1 - counter.testrepeatability();
+    %proportion = 1 - counter.testrepeatability();
+
+    % bias to right
+    output  = counter.testrepeatability();
 end
