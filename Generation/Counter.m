@@ -122,10 +122,25 @@ classdef Counter
             set(gcf, 'Position', 1000*[0.0066 0.5042 1.5000 0.3538])
         end
 
+        function generatesolid(obj, filename)
+            % Visualise a single simulation with default parameters
+            circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
+            writematrix(circles, 'CounterData/circles.txt');
+            f = fopen('CounterData/CounterName.txt','w');
+            fprintf(f, filename);
+            fclose(f);
+            % Generate .obj file of solid shape using IceSL API
+            evalc("system('IceSL-slicer.exe --io -s" +...
+                " ../Simulations/STLMorphology.lua');");
+        end
+
         function simulate(obj)
             % Visualise a single simulation with default parameters
             circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
             writematrix(circles, 'CounterData/circles.txt');
+            f = fopen('CounterData/CounterName.txt','w');
+            fprintf(f, 'simulated');
+            fclose(f);
             % Generate .obj file of solid shape using IceSL API
             evalc("system('IceSL-slicer.exe --io -s" +...
                 " ../Simulations/MeshMorphology.lua');");
@@ -138,6 +153,9 @@ classdef Counter
             % Visualise a single simulation with default parameters
             circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
             writematrix(circles, 'CounterData/circles.txt');
+            f = fopen('CounterData/CounterName.txt','w');
+            fprintf(f, 'simulated');
+            fclose(f);
             % Generate .obj file of solid shape using IceSL API
             evalc("system('IceSL-slicer.exe --io -s" +...
                 " ../Simulations/MeshMorphology.lua');");
@@ -160,10 +178,14 @@ classdef Counter
             Y = discretize(X, edges);
             %factor = length(find(Y==mode(Y)))/length(Y);
             %factor = 9*length(X) - sum(Y); %minimisation: bias to right
-            Y.'
             factor = 0;
             for i = 1:length(Y)
-                factor = factor + 9 - Y(i);
+                if isnan(Y(i))
+                    factor = factor + 9;
+                else
+                    %factor = factor + 9 - Y(i); % first bias
+                    factor = factor + Y(i); % second bias
+                end
             end
 
             if nargin == 2 && histbool == 1 % plot histogram if requested
