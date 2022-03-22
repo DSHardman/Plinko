@@ -183,8 +183,8 @@ classdef Counter
                 if isnan(Y(i))
                     factor = factor + 9;
                 else
-                    %factor = factor + 9 - Y(i); % first bias
-                    factor = factor + Y(i); % second bias
+                    factor = factor + 9 - Y(i); % first bias
+                    %factor = factor + Y(i); % second bias
                 end
             end
 

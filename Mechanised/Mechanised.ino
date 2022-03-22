@@ -88,14 +88,14 @@ switch (state) {
 
 void toprack(bool A){
   // 1 is inwards, 0 outwards
-  digitalWrite(top_pin1, !A);
-  digitalWrite(top_pin2, A);
+  digitalWrite(top_pin1, A);
+  digitalWrite(top_pin2, !A);
 }
 
 void bottomrack(bool A){
   // 1 is inwards, 0 outwards
-  digitalWrite(bottom_pin1, A);
-  digitalWrite(bottom_pin2, !A);
+  digitalWrite(bottom_pin1, !A);
+  digitalWrite(bottom_pin2, A);
 }
 
 void topoff(){
