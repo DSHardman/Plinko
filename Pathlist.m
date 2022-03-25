@@ -55,7 +55,10 @@ classdef Pathlist < handle
             for i = 1:length(obj.pathlist)
                 xends(i) = obj.pathlist(i).path(end, 1);
             end
-            histogram(xends,edges)
+            histogram(xends,edges, 'Normalization', 'probability');
+            ylim([0 0.5]);
+            set(gca, 'LineWidth', 2, 'FontSize', 15, 'xticklabel', []); box off;
+            ylabel('Probability');
         end
 
         function animatehistogram(obj, edges, image)
