@@ -159,6 +159,7 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
         if visualise:
             myapplication.EndScene()
     print('Maximum number of steps reached: ending simulation.')
+    return np.nan
 
 
 def output_repeatability(mesh):
