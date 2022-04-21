@@ -184,7 +184,7 @@ classdef Counter
                     factor = factor + 9;
                 else
                     %factor = factor + 9 - Y(i); % first bias
-                    factor = factor + Y(i); % second bias
+                    factor = factor + Y(i) - 1; % second bias
                 end
             end
 

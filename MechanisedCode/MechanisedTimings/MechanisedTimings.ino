@@ -1,5 +1,7 @@
 int drive_pin = 0;
 
+int magnet_pin = 12;
+
 int top_pin1 = 1;
 int top_pin2 = 2;
 
@@ -13,21 +15,27 @@ void setup() {
   pinMode(bottom_pin1, OUTPUT);
   pinMode(bottom_pin2, OUTPUT);
   pinMode(drive_pin, OUTPUT);
+  pinMode(magnet_pin, OUTPUT);
 
   topoff();
   bottomoff();
   drive(1);
+  digitalWrite(magnet_pin, 0);
 }
 
 void loop() {
   delay(6000);
   toprack(1);
+  digitalWrite(magnet_pin, 1);
   delay(6000);
+  toprack(0);
+  delay(500);
   topoff();
+  digitalWrite(magnet_pin, 0);
   delay(2000);
   toprack(0);
   bottomrack(1);
-  delay(5000);
+  delay(4500);
   topoff();
   delay(3000);
   bottomoff();
