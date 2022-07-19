@@ -7,8 +7,8 @@ import numpy as np
 
 
 # Simulation defined and run in here:
-def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=5000, friction=0.2,
-              write=False, visualise=False):
+def drop_disc(mesh, dropx=0.1, dropy=0, sliderspeed=3.0, sliderend=0.0, rotation=0, restitution=0.2, maxsteps=5000, friction=0.2,
+              stoplevel=4, write=False, visualise=False):
     # Defaults
     pegradius = 1
     pegspacing = 35
@@ -84,7 +84,7 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
     # Add top wall
     body_top = chrono.ChBody()
     body_top.SetBodyFixed(True)
-    body_top.SetPos(chrono.ChVectorD(5.75*pegspacing+7.5, pegspacing+54, 5))
+    body_top.SetPos(chrono.ChVectorD(5.75*pegspacing+7.5+sliderend, pegspacing+54, 5))
 
     body_top.GetCollisionModel().ClearModel()
     body_top.GetCollisionModel().AddBox(peg_mat, 2.25*pegspacing-7.5, 3, 10)
@@ -126,7 +126,7 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
     link_slider.Initialize(body_slider, body_top, chrono.CSYSNORM)
     my_system.Add(link_slider)
 
-    my_func = chrono.ChFunction_Ramp(0, -300)
+    my_func = chrono.ChFunction_Ramp(0, -100*sliderspeed)
     link_slider.SetMotion_X(my_func)
 
     # Add disc
@@ -201,7 +201,7 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
         if write:
             f.write(str(body_disc.GetCoord().pos.x) + ", " + str(body_disc.GetCoord().pos.y) + "\n")
         # Exit when bottom of board is reached
-        if body_disc.GetCoord().pos.y < -5.5*pegspacing:
+        if body_disc.GetCoord().pos.y < -stoplevel*pegspacing:
             if write:
                 f.close()
             return [body_disc.GetCoord().pos.x - 122.5]
@@ -210,23 +210,43 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
     print('Maximum number of steps reached: ending simulation.')
     return np.nan
 
+
 def output_repeatability(mesh):
-    dropxs = [0.1, 1.1, 2.1]
-    dropys = [-1, 0, 1]
-    rotations = [-np.pi/36, 0, np.pi/36]
-    restitutions = [0.2, 0.3, 0.4]
+    # dropxs = [0.1, 1.1, 2.1]
+    # dropys = [-1, 0, 1]
+    # rotations = [-np.pi/36, 0, np.pi/36]
+    # restitutions = [0.2, 0.3, 0.4]
+    #
+    # positions = [0]*(3**4)
+    #
+    # for i in range(3):
+    #     for j in range(3):
+    #         for k in range(3):
+    #             for m in range(3):
+    #                 position = drop_disc(mesh, dropxs[i], dropys[j], rotations[k], restitutions[m])
+    #                 if position is None:
+    #                     position = [np.nan]
+    #                 positions[m + 3*k + 9*j + 27*i] = (dropxs[i], dropys[j], rotations[k],
+    #                                                    restitutions[m], position[0])
+    #                 print(m + 3*k + 9*j + 27*i)
 
-    positions = [0]*(3**4)
+    sliderspeeds = [2.5, 3.0, 3.5, 4.0]
+    sliderends = [-1.0, -0.5, 0.5, 1.0]
+    restitutions = [0.2, 0.275, 0.35, 0.4]
 
-    for i in range(3):
-        for j in range(3):
-            for k in range(3):
-                for m in range(3):
-                    position = drop_disc(mesh, dropxs[i], dropys[j], rotations[k], restitutions[m])
-                    if position is None:
-                        position = [np.nan]
-                    positions[m + 3*k + 9*j + 27*i] = (dropxs[i], dropys[j], rotations[k],
-                                                       restitutions[m], position[0])
-                    print(m + 3*k + 9*j + 27*i)
+    positions = []
+
+    for i in range(4):
+        for j in range(4):
+            for k in range(4):
+                position = drop_disc(mesh, sliderspeed=sliderspeeds[i], sliderend=sliderends[j],
+                                     restitution=restitutions[k])
+                if position is None:
+                    position = [np.nan]
+
+                positions.append([sliderspeeds[i], sliderends[j], restitutions[k], position[0]])
+
+                print(k + 4*j + 16*i)
+
     np.save('C:/Users/dshar/OneDrive - University of Cambridge/Documents/PhD/Plinko/Simulations/Meshes/' + mesh,
             positions)
