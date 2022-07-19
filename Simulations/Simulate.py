@@ -81,13 +81,62 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
 
         my_system.Add(body_side)
 
+    # Add top wall
+    body_top = chrono.ChBody()
+    body_top.SetBodyFixed(True)
+    body_top.SetPos(chrono.ChVectorD(5.75*pegspacing+7.5, pegspacing+54, 5))
+
+    body_top.GetCollisionModel().ClearModel()
+    body_top.GetCollisionModel().AddBox(peg_mat, 2.25*pegspacing-7.5, 3, 10)
+    body_top.GetCollisionModel().BuildModel()
+    body_top.SetCollide(True)
+
+    body_top_shape = chrono.ChBoxShape()
+    body_top_shape.GetBoxGeometry().Size = chrono.ChVectorD(2.25*pegspacing-7.5, 3, 10)
+    body_top.GetAssets().push_back(body_top_shape)
+
+    body_top_texture = chrono.ChTexture()
+    body_top_texture.SetTextureFilename('concrete.jpg')
+    body_top.GetAssets().push_back(body_top_texture)
+
+    my_system.Add(body_top)
+
+    # Add slider
+    body_slider = chrono.ChBody()
+    body_slider.SetBodyFixed(False)
+    body_slider.SetPos(chrono.ChVectorD(6*pegspacing, pegspacing+90, 5))
+
+    body_slider.GetCollisionModel().ClearModel()
+    body_slider.GetCollisionModel().AddBox(peg_mat, 3, 30, 10)
+    body_slider.GetCollisionModel().BuildModel()
+    body_slider.SetCollide(True)
+
+    body_slider_shape = chrono.ChBoxShape()
+    body_slider_shape.GetBoxGeometry().Size = chrono.ChVectorD(3, 30, 10)
+    body_slider.GetAssets().push_back(body_slider_shape)
+
+    body_slider_texture = chrono.ChTexture()
+    body_slider_texture.SetTextureFilename('concrete.jpg')
+    body_slider.GetAssets().push_back(body_slider_texture)
+
+    my_system.Add(body_slider)
+
+    # Add slider motion
+    link_slider = chrono.ChLinkLockLock()
+    link_slider.Initialize(body_slider, body_top, chrono.CSYSNORM)
+    my_system.Add(link_slider)
+
+    my_func = chrono.ChFunction_Ramp(0, -300)
+    link_slider.SetMotion_X(my_func)
+
     # Add disc
     # Uses 'Method A' from irrlicht/demo_IRR_collision_trimesh.py example - automatically calculates properties
     body_disc = chrono.ChBodyEasyMesh(obj_path, disc_dens, True, True, True, disc_mat)
     # Trues are for: automatically compute mass and inertia, visualise, collide
 
     body_disc.SetBodyFixed(False)
-    body_disc.SetPos(chrono.ChVectorD(122.5+dropx, 105+dropy, 1))
+    # body_disc.SetPos(chrono.ChVectorD(122.5+dropx, 105+dropy, 1))
+    body_disc.SetPos(chrono.ChVectorD(5.5*pegspacing, 116, 1))
     body_disc.SetRot(chrono.Q_ROTATE_X_TO_Y)
     body_disc.SetRot(chrono.ChMatrix33D(rotation, chrono.ChVectorD(0, 0, 1)))
     my_system.Add(body_disc)
@@ -127,7 +176,7 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
         myapplication = chronoirr.ChIrrApp(my_system, 'Plinko Simulator', chronoirr.dimension2du(1024, 768))
         myapplication.SetTimestep(timestep)
         myapplication.AddTypicalSky()
-        myapplication.AddTypicalCamera(chronoirr.vector3df(-20, 60, 200), chronoirr.vector3df(2*pegspacing, -2*pegspacing, 0))
+        myapplication.AddTypicalCamera(chronoirr.vector3df(-20, 60, 200), chronoirr.vector3df(2*pegspacing, -1*pegspacing, 0))
         myapplication.AddLightWithShadow(chronoirr.vector3df(0, 0, 500),    # point
                                          chronoirr.vector3df(0, 0, 0),    # aimpoint
                                          2000,                 # radius (power)
@@ -160,7 +209,6 @@ def drop_disc(mesh, dropx=0.1, dropy=0, rotation=0, restitution=0.2, maxsteps=50
             myapplication.EndScene()
     print('Maximum number of steps reached: ending simulation.')
     return np.nan
-
 
 def output_repeatability(mesh):
     dropxs = [0.1, 1.1, 2.1]
