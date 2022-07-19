@@ -1,4 +1,4 @@
-function output = TestMorphology(x)
+function output = TestMorphology(x, level)
 
     % Parameters:
     % counter_radius: 10 to 15 (mm), radius of counter
@@ -28,5 +28,5 @@ function output = TestMorphology(x)
     %proportion = 1 - counter.testrepeatability();
 
     % bias to right
-    output  = counter.testrepeatability();
+    output  = counter.testrepeatability(level);
 end

@@ -149,7 +149,7 @@ classdef Counter
                 "1" + "');");
         end
 
-        function factor = testrepeatability(obj, histbool)
+        function factor = testrepeatability(obj, level, histbool)
             % Visualise a single simulation with default parameters
             circles = [0 0 obj.radius; obj.holeloc 5; obj.subtractive];
             writematrix(circles, 'CounterData/circles.txt');
@@ -160,35 +160,30 @@ classdef Counter
             evalc("system('IceSL-slicer.exe --io -s" +...
                 " ../Simulations/MeshMorphology.lua');");
             % Test repeatability using pychrono
-            evalc("system('py ../Simulations/TestRepeatability.py simulated');");
+            evalc("system('py ../Simulations/TestRepeatability.py simulated" +...
+                string(level) + "');");
             % Read data from file
             repeats = readNPY("../Simulations/Meshes/simulated.npy");
 
-            X = repeats(:, end);
+            X = -repeats(:, end); % minus sign to match expected coordinate system
             X(isnan(X)) = []; % Remove NaN elements
-%             if length(X) > 70
-%                 deviation = std(X); % return std of output positions
-%             else
-%                 deviation = 300; % set high if there are too many NaN elements
-%             end
-
-            % Output proportion of runs which land in the highest scoring
-            % bin
             edges = [-160 -122.5 -87.5 -52.5 -17.5 17.5 52.5 87.5 122.5 160];
             Y = discretize(X, edges);
-            %factor = length(find(Y==mode(Y)))/length(Y);
-            %factor = 9*length(X) - sum(Y); %minimisation: bias to right
-            factor = 0;
-            for i = 1:length(Y)
-                if isnan(Y(i))
-                    factor = factor + 9;
-                else
-                    %factor = factor + 9 - Y(i); % first bias
-                    factor = factor + Y(i) - 1; % second bias
-                end
-            end
+            factor = 1 - length(find(Y==mode(Y)))/length(Y);
+            
 
-            if nargin == 2 && histbool == 1 % plot histogram if requested
+%             %factor = 9*length(X) - sum(Y); %minimisation: bias to right
+%             factor = 0;
+%             for i = 1:length(Y)
+%                 if isnan(Y(i))
+%                     factor = factor + 9;
+%                 else
+%                     %factor = factor + 9 - Y(i); % first bias
+%                     factor = factor + Y(i) - 1; % second bias
+%                 end
+%             end
+
+            if nargin == 3 && histbool == 1 % plot histogram if requested
                 histogram(X,edges)
             end
         end

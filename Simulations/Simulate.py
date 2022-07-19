@@ -9,6 +9,7 @@ import numpy as np
 # Simulation defined and run in here:
 def drop_disc(mesh, dropx=0.1, dropy=0, sliderspeed=3.0, sliderend=0.0, rotation=0, restitution=0.2, maxsteps=5000, friction=0.2,
               stoplevel=4, write=False, visualise=False):
+
     # Defaults
     pegradius = 1
     pegspacing = 35
@@ -211,7 +212,7 @@ def drop_disc(mesh, dropx=0.1, dropy=0, sliderspeed=3.0, sliderend=0.0, rotation
     return np.nan
 
 
-def output_repeatability(mesh):
+def output_repeatability(mesh, stoplevel=4):
     # dropxs = [0.1, 1.1, 2.1]
     # dropys = [-1, 0, 1]
     # rotations = [-np.pi/36, 0, np.pi/36]
@@ -240,7 +241,7 @@ def output_repeatability(mesh):
         for j in range(4):
             for k in range(4):
                 position = drop_disc(mesh, sliderspeed=sliderspeeds[i], sliderend=sliderends[j],
-                                     restitution=restitutions[k])
+                                     restitution=restitutions[k], stoplevel=stoplevel)
                 if position is None:
                     position = [np.nan]
 
@@ -250,3 +251,5 @@ def output_repeatability(mesh):
 
     np.save('C:/Users/dshar/OneDrive - University of Cambridge/Documents/PhD/Plinko/Simulations/Meshes/' + mesh,
             positions)
+
+output_repeatability('simulated', 0)
