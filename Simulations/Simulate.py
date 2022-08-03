@@ -251,5 +251,3 @@ def output_repeatability(mesh, stoplevel=4):
 
     np.save('C:/Users/dshar/OneDrive - University of Cambridge/Documents/PhD/Plinko/Simulations/Meshes/' + mesh,
             positions)
-
-output_repeatability('simulated', 0)
