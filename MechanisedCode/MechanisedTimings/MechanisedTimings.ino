@@ -20,18 +20,18 @@ void setup() {
   topoff();
   bottomoff();
   drive(1);
-  digitalWrite(magnet_pin, 0);
+//  digitalWrite(magnet_pin, 0);
 }
 
 void loop() {
-  delay(6000);
+  delay(8000);
   toprack(1);
-  digitalWrite(magnet_pin, 1);
+//  digitalWrite(magnet_pin, 1);
   delay(6000);
   toprack(0);
   delay(500);
   topoff();
-  digitalWrite(magnet_pin, 0);
+//  digitalWrite(magnet_pin, 0);
   delay(2000);
   toprack(0);
   bottomrack(1);

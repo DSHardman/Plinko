@@ -170,6 +170,8 @@ classdef Counter
             X(isnan(X)) = []; % Remove NaN elements
             edges = [-160 -122.5 -87.5 -52.5 -17.5 17.5 52.5 87.5 122.5 160];
             Y = discretize(X, edges);
+
+            % Bayesian minimisation function: repatability at given level
             factor = 1 - length(find(Y==mode(Y)))/length(Y);
             
 
