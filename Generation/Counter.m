@@ -42,6 +42,7 @@ classdef Counter
             
             % Generate gcode from command line
             fprintf('Slicing Counter...\n');
+%             system('IceSL-slicer.exe --io -s MorphologyGeneration.lua');
             evalc("system('IceSL-slicer.exe --io -s" + ...
                 " MorphologyGeneration.lua');");
             fprintf('Counter Sliced.\n');

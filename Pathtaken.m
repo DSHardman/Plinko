@@ -19,10 +19,11 @@ classdef Pathtaken < handle
             end
                 
             %x = -obj.path(1:end,2);
-            x = obj.path(1:end,1);
+%             x = obj.path(1:end,1);
             %y = obj.path(1:end,1);
-            y = -obj.path(1:end,2);
-            plot(x,y+150, 'Color', col);
+%             y = -obj.path(1:end,2);
+%             plot(x,y+150, 'Color', col);
+            plot(-obj.path(:,1), obj.path(:,2), 'Color', col);
             %set(gca,'Color','k', 'XTick', [], 'YTick', []);
             %xlim([0 210])
             %ylim([0 150])

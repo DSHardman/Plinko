@@ -1,5 +1,6 @@
 -- setting up printer settings
 set_service('FilamentSlicer') -- Service mode: slice without GUI
+-- set_service('MeshExportService') -- Service mode: slice without GUI
 
 set_setting_value('printer', 'Prusa_MK3S')
 set_setting_value('z_layer_height_mm', 0.3)
@@ -18,7 +19,6 @@ set_setting_value('extruder_temp_degree_c_0',240.0)
 set_setting_value('flow_multiplier_0',1)
 set_setting_value('speed_multiplier_0',1)
 set_setting_value('filament_priming_mm_0',0)
-
 
 height = 3 -- This cannot be changed externally
 
@@ -47,7 +47,6 @@ file:close()
 -- Maintain a solid 2mm border around the payload, and emit shape
 emit(union(c, difference(cylinder(7, v(hole[1], hole[2], -height/2), v(hole[1], hole[2], height/2)),
                          cylinder(5, v(hole[1], hole[2], -height/2), v(hole[1], hole[2], height/2)))))
-
 
 -- Initialise the phasor infill fields
 phi = tex3d_rgb8f(64, 64, 64) -- INCLINATION scales between 0 & 360 degrees

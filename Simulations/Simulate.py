@@ -190,7 +190,7 @@ def drop_disc(mesh, dropx=0.1, dropy=0, sliderspeed=3.0, sliderend=0.0, rotation
         myapplication.SetTryRealtime(True)
 
     if write:
-        f = open("Path.txt", "w")
+        f = open("Path.txt", "a")
     for n in range(maxsteps):  # Maximum number of steps
         if visualise:
             myapplication.BeginScene()
