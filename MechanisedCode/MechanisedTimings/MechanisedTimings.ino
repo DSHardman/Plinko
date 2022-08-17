@@ -24,7 +24,7 @@ void setup() {
 }
 
 void loop() {
-  delay(8000);
+  delay(10000);
   toprack(1);
 //  digitalWrite(magnet_pin, 1);
   delay(6000);
