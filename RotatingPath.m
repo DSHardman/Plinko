@@ -18,7 +18,7 @@ classdef RotatingPath < handle
                 col = 'k';
             end
 
-            plot(obj.path(:,1), obj.path(:,2), 'Color', col);
+            plot(obj.path(:,1), -obj.path(:,2), 'Color', col);
             xlim([-400 400]);
             ylim([-400 400]);
             axis square

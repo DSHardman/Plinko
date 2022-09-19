@@ -34,7 +34,8 @@ end
 
 %% calculate paths from rotating system
 
-v = VideoReader('RotationTests/Videos/Repeats/Ystar.mp4');
+
+v = VideoReader('C:\Users\dshar\Downloads\zeta_1.mp4');
 imshow(read(v,50));
 centre = ginput(1);
 radius = ginput(1);
@@ -45,6 +46,15 @@ locations = zeros(v.NumFrames, 2);
 for n = 1:v.NumFrames
     
     im = imcrop(read(v,n), [centre(1)-radius centre(2)-radius radius*2 radius*2]);
+    for i = 1:size(im, 1)
+        for j = 1:size(im,2)
+            if sqrt((i-size(im,1)/2)^2 + (j-size(im,2)/2)^2) > radius
+                im(i, j, :) = [nan nan nan];
+            end
+        end
+    end
+
+
     for i = 1:size(im,1)
         for j = 1:size(im,2)
             if norm([i j] - [radius radius]) > radius
@@ -62,4 +72,4 @@ for n = 1:v.NumFrames
         locations(n,:) = [location(1)-radius location(2)-radius];
     end
 end
-Ystarrotate = RotatingPath(locations);
+zetarotate1 = RotatingPath(locations);
